@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.DAL;
@@ -30,8 +31,15 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
             {
                 ModelState.AddModelError("Photo", "Max size of image not be less than 200kb");
             }
-            
-            return Content(slide.Photo.ContentType.Contains("image/"));
+            if (!slide.Photo.ContentType.Contains("image/"))
+            {
+                ModelState.AddModelError("Photo", "Type of file must be image");
+                return View();
+            }
+            FileStream fileStream = 
+                new FileStream(@"C:\Users\Hp\OneDrive\İş masası\DBf\Fiorelloo\WebApplication1\wwwroot\img\"+slide.Photo.FileName,FileMode.Create);
+            slide.Photo.CopyTo(fileStream);
+            return Json(slide.Photo.FileName);
         }
     }
 }

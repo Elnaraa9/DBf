@@ -47,5 +47,20 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
+    
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return BadRequest();
+            var slider = _db.Slides.Find(id);
+            if (slider == null) return NotFound();
+           var path= Helper.GetPath(_env.WebRootPath, "img", slider.Url);
+            if (System.IO.File.Exists(path))
+            {
+                System.IO.File.Delete(path);
+            }
+            _db.Slides.Remove(slider);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

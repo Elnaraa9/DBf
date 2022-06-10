@@ -26,7 +26,12 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
             {
                 return View();
             }
-            return View();
+            if (slide.Photo.Length / 1024 > 200)
+            {
+                ModelState.AddModelError("Photo", "Max size of image not be less than 200kb");
+            }
+            
+            return Content(slide.Photo.ContentType.Contains("image/"));
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.DAL;
+using WebApplication1.Helpers;
 using WebApplication1.Models;
 
 namespace WebApplication1.Areas.AdminPanel.Controllers
@@ -30,11 +31,12 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
             {
                 return View();
             }
-            if (slide.Photo.Length / 1024 > 200)
+            if (!slide.Photo.CheckFileSize(200))
             {
                 ModelState.AddModelError("Photo", "Max size of image not be less than 200kb");
+                return View();
             }
-            if (!slide.Photo.ContentType.Contains("image/"))
+            if (!slide.Photo.CheckFileType("image/"))
             {
                 ModelState.AddModelError("Photo", "Type of file must be image");
                 return View();

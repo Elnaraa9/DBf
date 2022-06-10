@@ -15,19 +15,16 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
     {
         private AppDbContext _db { get; }
         private IWebHostEnvironment _env { get; }
-        public SliderController(IWebHostEnvironment env)
-        {
-            _env = env;
-        }
-        public SliderController(AppDbContext db)
+        public SliderController(AppDbContext db, IWebHostEnvironment env)
         {
             _db = db;
+            _env = env;
         }
         public IActionResult Index()
         {
             return View(_db.Slides);
         }
-        public IActionResult Create(Slide slide)
+        public async Task<IActionResult> Create(Slide slide)
         {
             if (!ModelState.IsValid)
             {
@@ -43,12 +40,16 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
                 return View();
             }
             var fileName = Guid.NewGuid().ToString() + slide.Photo.FileName;
-
-            using (FileStream fileStream = new FileStream(@"C:\Users\Hp\OneDrive\İş masası\DBf\Fiorelloo\WebApplication1\wwwroot\img\" + slide.Photo.FileName, FileMode.Create))
+            var resultPath = Path.Combine(_env.WebRootPath, "img", fileName);
+            using (FileStream fileStream = 
+                new FileStream(resultPath + slide.Photo.FileName, FileMode.Create))
             {
-                slide.Photo.CopyTo(fileStream);
+               await slide.Photo.CopyToAsync(fileStream);
             }
-            return Json(slide.Photo.FileName);
+            slide.Url = fileName;
+            await _db.Slides.AddAsync(slide);
+            await _db.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

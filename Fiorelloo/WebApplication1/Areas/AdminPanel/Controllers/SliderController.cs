@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -13,6 +14,11 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
     public class SliderController : Controller
     {
         private AppDbContext _db { get; }
+        private IWebHostEnvironment _env { get; }
+        public SliderController(IWebHostEnvironment env)
+        {
+            _env = env;
+        }
         public SliderController(AppDbContext db)
         {
             _db = db;
@@ -36,9 +42,12 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
                 ModelState.AddModelError("Photo", "Type of file must be image");
                 return View();
             }
-            FileStream fileStream = 
-                new FileStream(@"C:\Users\Hp\OneDrive\İş masası\DBf\Fiorelloo\WebApplication1\wwwroot\img\"+slide.Photo.FileName,FileMode.Create);
-            slide.Photo.CopyTo(fileStream);
+            var fileName = Guid.NewGuid().ToString() + slide.Photo.FileName;
+
+            using (FileStream fileStream = new FileStream(@"C:\Users\Hp\OneDrive\İş masası\DBf\Fiorelloo\WebApplication1\wwwroot\img\" + slide.Photo.FileName, FileMode.Create))
+            {
+                slide.Photo.CopyTo(fileStream);
+            }
             return Json(slide.Photo.FileName);
         }
     }

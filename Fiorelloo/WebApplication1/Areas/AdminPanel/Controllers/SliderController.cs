@@ -41,14 +41,8 @@ namespace WebApplication1.Areas.AdminPanel.Controllers
                 ModelState.AddModelError("Photo", "Type of file must be image");
                 return View();
             }
-            var fileName = Guid.NewGuid().ToString() + slide.Photo.FileName;
-            var resultPath = Path.Combine(_env.WebRootPath, "img", fileName);
-            using (FileStream fileStream = 
-                new FileStream(resultPath + slide.Photo.FileName, FileMode.Create))
-            {
-               await slide.Photo.CopyToAsync(fileStream);
-            }
-            slide.Url = fileName;
+           
+            slide.Url =await slide.Photo.SaveFileAsync(_env.WebRootPath,"img");
             await _db.Slides.AddAsync(slide);
             await _db.SaveChangesAsync();
             return RedirectToAction(nameof(Index));

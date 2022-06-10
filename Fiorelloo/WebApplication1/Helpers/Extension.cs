@@ -17,16 +17,25 @@ namespace WebApplication1.Helpers
         {
             return file.ContentType.Contains(type);
         }
-        public static string SaveFile(this IFormFile file,string root,params string[] folders)
+        public async static Task<string> SaveFileAsync(this IFormFile file,string root,params string[] folders)
         {
             var fileName = Guid.NewGuid().ToString() + file.FileName;
-            var resultPath = Path.Combine(root, "img", fileName);
+            var resultPath = Path.Combine(GetPath(root,folders), "img", fileName);
             using (FileStream fileStream =
                 new FileStream(resultPath, FileMode.Create))
             {
-                file.CopyTo(fileStream);
+                file.CopyToAsync(fileStream);
             }
-            return fileName
+            return fileName;
+        }
+        public static string GetPath(string root, params string[] folders)
+        {
+            string resultPath = root;
+            foreach (var folder in folders)
+            {
+                resultPath = Path.Combine(resultPath, folder);
+            }
+            return resultPath;
         }
     }
 }

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using WebApplication1.DAL;
+using WebApplication1.Services;
 
 namespace WebApplication1
 {
@@ -30,7 +31,7 @@ namespace WebApplication1
                 options.UseSqlServer(_config["ConnectionStrings:Default"]);
 
             });
-
+            services.AddScoped<SettingService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
